@@ -825,6 +825,20 @@ function cacheUIElements() {
     });
 }
 
+// --- 新增：移动端视口高度修正 ---
+function resizeGame() {
+    const container = document.getElementById('game-container');
+    if (container) {
+        // 获取实际可视高度
+        const h = window.innerHeight;
+        // 强制设置容器高度
+        container.style.height = h + 'px';
+        
+        // 触发重新布局，解决部分浏览器重绘问题
+        container.offsetHeight; 
+    }
+}
+
 function showMask()
  { ui.sceneMask.classList.add('active'); 
 // 新增：给底部区域加上深色背景，使其变暗
@@ -836,6 +850,11 @@ function hideMask() { ui.sceneMask.classList.remove('active');
  }
 
 function initGame() {
+
+    // 【新增】立即修正高度，并监听窗口变化
+    resizeGame(); 
+    window.addEventListener('resize', resizeGame);
+
  // 1. 隐藏顶部资源增长
     const incomeStats = document.getElementById('income-stats');
     if(incomeStats) incomeStats.style.display = 'none';
@@ -2497,8 +2516,8 @@ function handleBuildingDrag(e) {
     }
     
     const ghost = document.getElementById('placement-ghost');
-    const ghostW = 60; 
-    const ghostH = 60;
+    const ghostW = 50; 
+    const ghostH = 50;
     const containerRect = ui.buildingsContainer.getBoundingClientRect();
     
     // 计算相对于容器的坐标
@@ -2520,16 +2539,19 @@ function handleBuildingDrag(e) {
     }
 }
 
-// 6. 碰撞检测算法
-// 6. 碰撞检测算法 (已修改：扩大可建造区域)
+// 6. 碰撞检测算法 (已修改：放宽可建造区域)
 function checkCollision(x, y, w, h, containerW, containerH) {
     // 1. 边界检测
-    // 修改：将 0.3 改为 0.1，让上方更多区域可以摆放
-    if (y < containerH * 0.15) return false; 
+    // 【修改】将 y < containerH * 0.15 改为 y < containerH * 0.05
+    // 允许建筑摆放在更靠上的位置，只要不遮挡顶部UI即可
+    if (y < containerH * 0.05) return false; 
+    
+    // 左右边界
     if (x < 0 || x + w > containerW) return false;
+    // 底部边界 (允许摆放到稍微靠下的位置，反正有 padding)
     if (y + h > containerH) return false;
 
-    // 2. 建筑间重叠检测
+    // 2. 建筑间重叠检测 (保持不变)
     for (let b of placedBuildings) {
         let bx = (b.x / 100) * containerW;
         let by = (b.y / 100) * containerH;
@@ -2569,8 +2591,8 @@ function placeBuilding(e) {
             id: selectedBuilding.id,
             x: (xPx / containerRect.width) * 100,
             y: (yPx / containerRect.height) * 100,
-            w: (60 / containerRect.width) * 100,
-            h: (60 / containerRect.height) * 100
+            w: (50 / containerRect.width) * 100,
+            h: (50 / containerRect.height) * 100
         };
         
         // 缓存数据
@@ -2595,7 +2617,7 @@ function placeBuilding(e) {
         createBuildingDOM(selectedBuilding, posData);
         
         // 飘字逻辑 (使用了修复后的函数)
-        let centerX = containerRect.left + xPx + 30; 
+        let centerX = containerRect.left + xPx + 25; 
         let centerY = containerRect.top + yPx; 
 
         createFloatingText(centerX , centerY, costType, -costVal, 1000);
@@ -2648,7 +2670,7 @@ function calculateScoreAndGrade() {
     const scoreChar = characters.length * 50;
     
     // 存活奖励 (能玩到最后没死)
-    const scoreSurvival = 200;
+    const scoreSurvival = 50;
 
     // 总分
     const totalScore = Math.floor(scoreRes + scoreBuild + scoreChar + scoreSurvival);
@@ -2657,15 +2679,15 @@ function calculateScoreAndGrade() {
     let grade = 'C';
     let comment = "乱世浮萍，勉强生存。";
     
-    if (totalScore >= 1200) {
+    if (totalScore >= 2000) {
         grade = 'S';
         comment = "千古一帝，万世传颂！大唐盛世因你而辉煌！";
-    } else if (totalScore >= 900) {
+    } else if (totalScore >= 1500) {
         grade = 'A';
-        comment = "治世能臣，国富民强。";
-    } else if (totalScore >= 600) {
+        comment = "中兴之主，国富民强。";
+    } else if (totalScore >= 1000) {
         grade = 'B';
-        comment = "守成之君，不过不失。";
+        comment = "中庸之君，不过不失。";
     }
 
     return { score: totalScore, grade: grade, comment: comment, details: {res: scoreRes, build: scoreBuild, char: scoreChar} };

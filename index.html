@@ -7,14 +7,21 @@
     <style>
         body { margin: 0; padding:0; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #1a1a1a; color: white; overflow: hidden; user-select: none; display: flex; justify-content: center; height: 100vh; }
         
-        /* 游戏主容器 */
-        #game-container { width: 100%; max-width: 450px; height: 100%; position: relative; display: flex; flex-direction: column; touch-action: none; background-image: url('https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/scene.jpg'); background-size: cover; background-position: center; 
-              /* 修改：这里的背景图设为最终的雪景图 */
-    background-image: url('https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/scene3.jpg'); 
-    background-size: cover;
-    background-position: center;
+        /* 1. 游戏主容器：移除 height: 100vh，改由 JS 控制 */
+        #game-container { 
+            width: 100%; 
+            /* height: 100vh;  【删除或注释掉这一行】 */
+            max-width: 450px; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            touch-action: none; 
+            background-image: url('https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/scene3.jpg'); 
+            background-size: cover;
+            background-position: center;
+            /* 新增：防止溢出 */
+            overflow: hidden; 
         }
-
 
         
         /* 1. 顶部数值栏 */
@@ -109,6 +116,9 @@
         #world-layer { 
     flex: 1; position: relative; overflow: hidden; 
     z-index: 5; /* 新增：明确层级，大于 bg-mask 的 2 */
+     /* 【核心修改】向下扩展 220px（滑动区域的高度） */
+            margin-bottom: -220px; 
+            background: transparent; /* 确保背景透明，露出后面的图片 */
 }
          /* 确保遮罩层级较低 */
         #scene-mask { 
@@ -224,16 +234,21 @@
         .center-text.left-text.active { color: #ff9999; }
         .center-text.right-text.active { color: #99ff99; }
 
-         /* 4. 滑动区域 (底部) */
+           /* 滑动区域：保持原有高度，作为交互层覆盖在场景层之上 */
         #swipe-area {
             height: 220px; 
             position: relative; 
+            /* 将 z-index 设为 50，确保它在场景层(5)之上 */
+            z-index: 100; 
+            /* 保证背景透明，这样能看到下面的建筑 */
             background: transparent; 
-            display: flex; justify-content: center; align-items: center; flex-shrink: 0; z-index: 50; 
+            display: flex; justify-content: center; align-items: center; flex-shrink: 0; 
+            pointer-events: none; /* 【重要】容器本身不捕获事件，由子元素卡片捕获 */
         }
         
           /* 修改：卡片宽度加大，高度稍微加高 */
         #swipe-card { 
+            pointer-events: auto;
             width: 200px;   /* 从 160px 改为 200px */
             height: 180px;  /* 从 120px 改为 180px */
             background: linear-gradient(135deg, #f6f6f6 0%, #e0e0e0 100%); 
@@ -342,16 +357,17 @@
         #restart-btn { background: #337ab7; color: white; padding: 15px 40px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; border: none; }
 
 
-              /* --- 3. 预言倒计时面板优化 (修改版) --- */
-#prophecy-panel {
-    position: absolute; 
-    right: 10px; 
-    bottom: 240px; 
-    display: none; 
-    flex-direction: column; 
-    align-items: flex-end; 
-    z-index: 150;
-}
+   /* 2. 预言面板：改为 top 定位，紧贴资源栏 */
+        #prophecy-panel {
+            position: absolute; 
+            top: 200px; /* 从上往下200 */
+            right: 10px; 
+            display: none; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            gap: 2px; 
+            z-index: 150; 
+        }
 
 /* 内部的信息横条 */
 .prophecy-bar {
@@ -537,15 +553,28 @@
 /* 建造按钮颜色 */
 #build-btn { border-color: #4a90e2; background: rgba(0, 50, 100, 0.7); }
 
-/* 建筑选择面板 */
-#build-panel {
-    position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; 
-    background: rgba(20, 20, 25, 0.95); 
-    border-top: 2px solid #cfaa66;
-    z-index: 200; display: none; flex-direction: column;
-    transform: translateY(100%); transition: transform 0.3s ease-out;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
-}
+  /* 3. 建造面板：适配底部安全区 */
+        #build-panel {
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            /* 高度改为自适应，最大高度限制 */
+            height: auto; 
+            max-height: 45%; 
+            background: rgba(20, 20, 25, 0.98); 
+            border-top: 2px solid #cfaa66;
+            z-index: 200; 
+            display: none; 
+            flex-direction: column;
+            transform: translateY(100%); 
+            transition: transform 0.3s ease-out;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+            /* 关键：增加底部内边距，适配手机底部工具栏/安全区 */
+            padding-bottom: env(safe-area-inset-bottom, 20px); 
+            box-sizing: border-box;
+        }
+
 #build-panel.open { transform: translateY(0); display: flex; }
 .panel-header { padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; }
 .panel-title { font-size: 16px; font-weight: bold; color: #cfaa66; }
@@ -568,7 +597,7 @@
 
 /* 拖拽时的虚影 */
 #placement-ghost {
-    position: absolute; width: 60px; height: 60px; 
+    position: absolute; width: 50px; height: 50px; 
     z-index: 200; pointer-events: none; display: none;
     flex-direction: column; align-items: center; justify-content: flex-end;
     opacity: 0.8;
@@ -581,7 +610,7 @@
 /* 修改原 .building 样式：定位改为 top/left 以便手动放置 */
 .building { 
     position: absolute; /* 关键！ */
-    width: 60px; height: 60px; 
+    width: 50px; height: 50px; 
     font-size: 10px; color: rgba(255,255,255,0.9); text-shadow: 0 0 2px black; 
     pointer-events: auto; 
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
