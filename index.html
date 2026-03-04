@@ -18,12 +18,89 @@
 
         
         /* 1. 顶部数值栏 */
-        #ui-top { height: 60px; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: space-around; align-items: center; z-index: 100; flex-shrink: 0; position: relative; }
-        .res-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; }
-        .res-icon { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; margin-bottom: 2px; }
-        .res-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .res-value { font-weight: bold; color: #ffd700; transition: transform 0.2s; }
-        .res-value.highlight { color: #00FF00; transform: scale(1.2); }
+        #ui-top { 
+    height: 70px; 
+    background: rgba(20, 20, 30, 0.75); /* 深色半透明 */
+    backdrop-filter: blur(10px);        /* 毛玻璃效果 */
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    display: flex; justify-content: space-evenly; align-items: center; 
+    z-index: 100; flex-shrink: 0; position: relative; 
+    padding: 0 10px;
+}
+        .res-item { 
+    display: flex; flex-direction: column; align-items: center; 
+    width: 22%; position: relative;
+}
+
+
+
+/* 资源图标容器 */
+.res-icon { 
+    width: 32px; height: 32px; 
+    background: rgba(0,0,0,0.3); border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    margin-bottom: 4px; border: 1px solid rgba(255,255,255,0.1);
+}
+.res-icon img { width: 20px; height: 20px; object-fit: contain; }
+
+/* 数值显示 */
+.res-value { 
+    font-family: 'Courier New', Courier, monospace; /* 科技感字体 */
+    font-weight: bold; color: #fff; font-size: 14px;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    z-index: 2;
+}
+
+ /* --- 新增：资源预览样式 (滑动时) --- */
+        /* 预览效果：橙色高亮 + 问号提示，表示数值即将变化 */
+        .res-value.res-preview {
+            color: #ffa500 !important; /* 橙色 */
+            transform: scale(1.3);
+            text-shadow: 0 0 8px #ffa500;
+            transition: all 0.1s ease-out;
+        }
+        
+/* 资源进度条背景 (灰条) */
+.res-bar-bg {
+    width: 100%; height: 4px; background: rgba(255,255,255,0.2);
+    border-radius: 2px; margin-top: 4px; overflow: hidden;
+}
+
+/* 资源进度条前景 (动态条) */
+.res-bar-fill {
+    height: 100%; width: 0%; transition: width 0.5s ease;
+    box-shadow: 0 0 5px currentColor;
+}
+/* 各资源颜色定义 */
+#bar-treasury { background-color: #f1c40f; color: #f1c40f; } /* 金黄 */
+#bar-people { background-color: #3498db; color: #3498db; }   /* 蓝 */
+#bar-military { background-color: #e74c3c; color: #e74c3c; } /* 红 */
+#bar-culture { background-color: #9b59b6; color: #9b59b6; }  /* 紫 */
+
+         /* --- 资源数值动效增强 --- */
+        /* 增加效果：绿色 + 向上弹跳 */
+        .res-value.res-increase {
+            color: #00ff00 !important;
+            transform: scale(1.4) translateY(-5px);
+            text-shadow: 0 0 10px #00ff00;
+            transition: all 0.1s ease-out;
+        }
+
+        /* 减少效果：红色 + 左右抖动 */
+        .res-value.res-decrease {
+            color: #ff4444 !important;
+            transform: scale(1.2);
+            animation: shake 0.3s ease-in-out;
+            text-shadow: 0 0 8px #ff0000;
+        }
+
+         /* 抖动动画关键帧 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
         .res-value.warning { color: #FF0000; animation: blink 1s infinite; }
         .res-value.guess { color: #FFA500; transform: scale(1.2); transition: color 0.2s; }
         @keyframes blink { 50% { opacity: 0.5; } }
@@ -33,7 +110,13 @@
     flex: 1; position: relative; overflow: hidden; 
     z-index: 5; /* 新增：明确层级，大于 bg-mask 的 2 */
 }
-        #scene-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 10; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; will-change: opacity; }
+         /* 确保遮罩层级较低 */
+        #scene-mask { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.5); 
+            z-index: 10; /* 遮罩层级设为 10 */
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none; will-change: opacity; 
+        }
         #scene-mask.active { opacity: 1; }
 
         /* 2. 新增：原背景遮罩层 */
@@ -54,23 +137,30 @@
 /* 确保 scene-mask (黑色遮罩) 在 bg-mask 之上 */
 #scene-mask { z-index: 10; }
         
-        /* 修改：标题和描述下移 */
+     /* 确保标题层级高于遮罩 */
         #event-display { 
             width: 90%; position: absolute; 
-            top: 80px; /* 从 15px 改为 80px，向下移动 */
-            left: 50%; transform: translateX(-50%); text-align: center; z-index: 20; pointer-events: none; transition: opacity 0.3s; 
+            top: 80px; 
+            left: 50%; transform: translateX(-50%); text-align: center; 
+            z-index: 100;  /* 标题层级设为 100 */
+            pointer-events: none; transition: opacity 0.3s; 
         }
         #event-title { font-size: 22px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 8px; }
         #event-desc { font-size: 15px; color: #eee; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); line-height: 1.5; }
         
         #idle-panel { position: absolute; top: 50px; left: 10px; right: 10px; background: rgba(0,0,0,0.7); border-radius: 8px; padding: 10px; display: none; z-index: 60; }
-        #final-timer { text-align: center; font-size: 18px; color: #ffcc00; font-weight: bold; }
+        #final-timer { 
+    text-align: center; 
+    font-size: 18px; 
+    color: #ffcc00; 
+    font-weight: bold;
+    width: 100%; /* 【新增】强制占满一行，确保居中生效 */
+}
+
         #income-stats { display: flex; justify-content: space-around; font-size: 12px; color: #aaa; margin-top: 5px; }
         
         /* 建筑与人物 */
         #buildings-container { position: absolute; bottom: 0; left: 0; right: 0; height: 100%; pointer-events: none; z-index: 1; }
-        .building { position: absolute; min-width: 60px; height: 70px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; animation: buildUp 0.5s ease-out backwards; font-size: 12px; margin: 0 2px; will-change: transform, opacity; color: rgba(30, 30, 30, 0.9); text-shadow: 0 0 2px rgba(255,255,255,0.6); }
-        .building-icon { width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; margin-bottom: 2px; }
         .building-icon img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
         @keyframes buildUp { from { transform: translateY(20px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         .character-entity { position: absolute; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 6; border: 1px solid #333; overflow: hidden; }
@@ -107,16 +197,18 @@
 }
 
         /* 3. 文字层 (独立层级，屏幕中央偏下) */
-        /* 修改：下移一点，确保不遮挡上方标题 */
+        /* 修改：文字层层级提升 */
         #text-layer {
             position: absolute;
-            top: 55%;         /* 从 50% 改为 55%，稍微下移 */
+            top: 55%;         
             left: 0; width: 100%;
             transform: translateY(-50%); 
-            z-index: 200;      
+            /* 【核心修复】设为 25，确保在所有元素之上 */
+            z-index: 25;      
             pointer-events: none; 
             display: flex; justify-content: center; align-items: center;
         }
+        
         .center-text {
             position: absolute;
             width: 80%;
@@ -132,22 +224,28 @@
         .center-text.left-text.active { color: #ff9999; }
         .center-text.right-text.active { color: #99ff99; }
 
-        /* 4. 滑动区域 (底部) */
-        #swipe-area {height: 220px; 
-    position: relative; 
-    /* 修改：去掉深色背景，改为透明，或者保留一点点底色 */
-    background: transparent; 
-    /* 或者保留淡黑：background: linear-gradient(to top, rgba(0,0,0,0.3), transparent); */
-    
-    display: flex; justify-content: center; align-items: center; flex-shrink: 0; z-index: 50; }
-        
-        /* 修改：卡片宽度减半 */
-        #swipe-card { 
-            width: 160px; height: 120px; /* 宽度 320 -> 160 */
-            background: linear-gradient(135deg, #f6f6f6 0%, #e0e0e0 100%); 
-            border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: absolute; display: flex; justify-content: center; align-items: center; color: #333; transition: transform 0.1s, opacity 0.3s; will-change: transform, opacity; overflow: hidden;
+         /* 4. 滑动区域 (底部) */
+        #swipe-area {
+            height: 220px; 
+            position: relative; 
+            background: transparent; 
+            display: flex; justify-content: center; align-items: center; flex-shrink: 0; z-index: 50; 
         }
         
+          /* 修改：卡片宽度加大，高度稍微加高 */
+        #swipe-card { 
+            width: 200px;   /* 从 160px 改为 200px */
+            height: 180px;  /* 从 120px 改为 180px */
+            background: linear-gradient(135deg, #f6f6f6 0%, #e0e0e0 100%); 
+            border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+            position: absolute; 
+            display: flex; justify-content: center; align-items: center; 
+            color: #333; 
+            transition: transform 0.1s, opacity 0.3s; 
+            will-change: transform, opacity; 
+            overflow: hidden;
+        }
+
         /* 竖条按钮 (占满卡片) */
         .swipe-bar {
             position: absolute;
@@ -159,19 +257,338 @@
         .bar-right { right: 0; background: linear-gradient(to left, rgba(92, 184, 92, 1), rgba(92, 184, 92, 0.6)); }
 
         /* 右侧UI */
-        #side-ui { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 150; display: none; }
-        .action-btn { width: 70px; height: 70px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; }
-        #recruit-btn.active { box-shadow: 0 0 15px #ffd700; border-color: #ffd700; }
+        /* --- 2. 右侧按钮优化 (扁平化 + 动效) --- */
+#side-ui { 
+    position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 20px; z-index: 150; 
+    /* display: none; 由JS控制显示 */
+}
+
+.action-btn { 
+    width: 60px; height: 60px; 
+    background: linear-gradient(145deg, #2a2a2a, #333);
+    border-radius: 12px; /* 圆角矩形 */
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 5px 5px 10px #1a1a1a, -5px -5px 10px #444;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; 
+    cursor: pointer; transition: all 0.2s ease;
+    position: relative;
+}
+.action-btn:active {
+    box-shadow: inset 5px 5px 10px #1a1a1a, inset -5px -5px 10px #444;
+    transform: scale(0.95);
+}
+
+.action-btn div:first-child { font-size: 24px; margin-bottom: 2px; }
+.action-btn div:last-child { font-size: 10px; color: #aaa; font-weight: bold; }
+
+
+      
+        /* 招募按钮激活态 */
+#recruit-btn.active {
+    /* 背景改为亮绿色渐变 */
+    background: linear-gradient(145deg, #2e7d32, #1b5e20) !important;
+    /* 加上发光效果 */
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6), inset 0 0 10px rgba(255,255,255,0.2);
+    /* 边框变亮 */
+    border-color: #4caf50 !important;
+}
+
+/* 激活状态下的文字颜色 */
+#recruit-btn.active div:last-child {
+    color: #fff !important; /* 文字变白 */
+}
+
+
+/* 激活状态下的图标(加号)也可以稍微亮点 */
+#recruit-btn.active div:first-child {
+    color: #fff;
+    text-shadow: 0 0 5px #fff;
+}
+
+/* 冷却遮罩层 */
+#recruit-overlay {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 0%;
+    background: rgba(0, 0, 0, 0.7); /* 深色遮罩 */
+    pointer-events: none;
+    transition: height 0.1s linear;
+    z-index: 2;
+}
+
+/* 冷却时的倒计时数字 */
+#recruit-timer-text {
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 20px; font-weight: bold; color: #fff;
+    text-shadow: 0 0 4px #000;
+    z-index: 3;
+    display: none;
+
+    /* 当按钮处于激活状态(有次数)时，确保遮罩不挡住图标点击 */
+#recruit-btn.active #recruit-overlay {
+    background: rgba(0,0,0,0.2); /* 如果有次数但正在恢复下一个，遮罩变浅或完全透明 */
+    /* 或者直接设置 display: none; 如果你想完全不显示 */
+    display: none; 
+}
+}
         #disaster-btn { display: none; background: rgba(150, 0, 0, 0.8); animation: pulse 1.5s infinite; }
         #disaster-btn.show { display: flex; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } }
-        #progress-ring { position: absolute; top: 0; left: 0; width: 70px; height: 70px; transform: rotate(-90deg); pointer-events: none; }
-        #progress-ring circle { fill: transparent; stroke-width: 3px; stroke: #ffd700; stroke-dasharray: 188.5; stroke-dashoffset: 188.5; transition: stroke-dashoffset 0.1s; }
 
         /* 结算层 */
         #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; text-align: center; }
         #overlay h1 { color: #ffd700; } #overlay p { margin-bottom: 30px; white-space: pre-line; line-height: 1.6; }
         #restart-btn { background: #337ab7; color: white; padding: 15px 40px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; border: none; }
+
+
+              /* --- 3. 预言倒计时面板优化 (修改版) --- */
+#prophecy-panel {
+    position: absolute; 
+    right: 10px; 
+    bottom: 240px; 
+    display: none; 
+    flex-direction: column; 
+    align-items: flex-end; 
+    z-index: 150;
+}
+
+/* 内部的信息横条 */
+.prophecy-bar {
+    background: rgba(0, 0, 0, 0.45); /* 更加透明 */
+    border: 1px solid #f0ad4e; /* 黄色边框 */
+    border-radius: 4px;
+    padding: 5px 8px; /* 缩小内边距 */
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    gap: 6px; /* 间距缩小 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    backdrop-filter: blur(3px);
+}
+
+/* 事件标题 */
+.prophecy-name {
+    color: #f0ad4e; /* 黄色 */
+    font-weight: bold;
+    font-size: 12px; /* 缩小字体 */
+    /* margin-right: auto;  移除 auto，让标题和资源靠在一起 */
+    white-space: nowrap; /* 防止换行 */
+}
+
+/* 资源需求显示 */
+.prophecy-res {
+    color: #fff;
+    font-size: 11px;
+    display: flex; align-items: center; gap: 3px;
+}
+
+/* 移除原来的大标题样式，改为紧凑显示 */
+.prophecy-title {
+    display: none; /* 如果此元素还在，通常不需要单独显示大标题 */
+}
+
+.prophecy-req {
+    color: #fff; font-size: 11px; display: flex; align-items: center; gap: 3px;
+    margin-bottom: 0; /* 移除下边距 */
+}
+
+/* 倒计时样式：改为小字体 */
+.prophecy-timer-outside {
+    font-size: 12px; /* 缩小字体 */
+    font-family: sans-serif; /* 使用普通字体 */
+    color: #fff;
+    background: rgba(0,0,0,0.4);
+    padding: 2px 5px;
+    border-radius: 3px;
+    text-shadow: none; /* 移除阴影 */
+    margin-top: 2px; /* 与上方框保持小间距 */
+    margin-right: 0;
+    animation: none; /* 移除脉动动画 */
+}
+
+.prophecy-timer {
+    font-size: 12px; 
+    color: #f0ad4e; /* 黄色 */
+    font-family: monospace; 
+    font-weight: bold;
+    align-self: flex-end;
+}
+
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+        /* 角色容器 */
+.character-unit {
+    position: absolute;
+    width: 50px;
+    height: 60px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-align: center;
+}
+.character-unit:hover {
+    transform: scale(1.1);
+    z-index: 999 !important;
+}
+
+/* 角色头像 */
+.char-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    overflow: hidden;
+    margin: 0 auto;
+    background: #fff;
+}
+.char-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 角色名字 */
+.char-info {
+    font-size: 10px;
+    text-align: center;
+    margin-top: 2px;
+    font-weight: bold;
+}
+
+/* 气泡容器，定位在角色头顶 */
+.bubble-container {
+    position: absolute;
+    bottom: 100%; /* 在角色头顶 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    z-index: 100;
+    margin-bottom: 5px;
+}
+
+/* 气泡样式 */
+.resource-bubble {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    padding: 4px 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid #fff;
+    /* 移除之前的 transform: translateX(-50%)，因为 flex 已经居中了 */
+    pointer-events: auto; /* 确保气泡可点击，父容器是 none */
+}
+
+/* 点击屏幕飘字效果 */
+.floating-text {
+    position: fixed; /* 固定定位，跟随点击位置 */
+    transition: all 0.5s ease-out;
+    pointer-events: none; /* 不阻挡后续点击 */
+    font-weight: bold;
+    font-size: 18px;
+    z-index: 9999;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    opacity: 1;
+}
+
+.resource-bubble:active {
+    transform: scale(0.9) translateX(-50%); /* 点击缩小效果 */
+}
+
+/* 气泡弹出动画 */
+.bounce-animation {
+    animation: bubbleFloat 2s infinite ease-in-out;
+}
+
+@keyframes bubbleFloat {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* 点击消失动画 */
+.bubble-pop {
+    animation: popUp 0.5s ease-out forwards !important;
+    /* 禁用点击事件，防止连点 */
+    pointer-events: none; 
+}
+
+@keyframes popUp {
+    0% { transform: translateX(-50%) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-50px) scale(1.5); opacity: 0; }
+}
+
+/* 资源图标辅助类 */
+.res-icon-treasury::before { content: '💰'; }
+.res-icon-people::before { content: '👥'; }
+.res-icon-military::before { content: '🗡️'; }
+.res-icon-culture::before { content: '📜'; }
+
+/* --- 新增：建造系统样式 --- */
+/* 建造按钮颜色 */
+#build-btn { border-color: #4a90e2; background: rgba(0, 50, 100, 0.7); }
+
+/* 建筑选择面板 */
+#build-panel {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; 
+    background: rgba(20, 20, 25, 0.95); 
+    border-top: 2px solid #cfaa66;
+    z-index: 200; display: none; flex-direction: column;
+    transform: translateY(100%); transition: transform 0.3s ease-out;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+}
+#build-panel.open { transform: translateY(0); display: flex; }
+.panel-header { padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; }
+.panel-title { font-size: 16px; font-weight: bold; color: #cfaa66; }
+.close-btn { font-size: 24px; cursor: pointer; color: #888; padding: 0 10px; }
+.build-grid { flex: 1; overflow-y: auto; padding: 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-content: start; }
+
+/* 单个建筑选项 */
+.build-item { 
+    background: rgba(255,255,255,0.05); border-radius: 5px; padding: 5px; 
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    cursor: pointer; border: 1px solid transparent; position: relative;
+}
+.build-item:active { background: rgba(255,255,255,0.15); }
+.build-item.disabled { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
+.build-icon-img { width: 35px; height: 35px; margin-bottom: 5px; object-fit: contain; }
+.build-name { font-size: 10px; color: #fff; margin-bottom: 2px; }
+.build-cost { font-size: 9px; color: #ff6b6b; display: flex; align-items: center; gap: 2px; }
+.build-gain { font-size: 9px; color: #5cb85c; display: flex; align-items: center; gap: 2px; }
+.build-effect-row { display: flex; width: 100%; justify-content: space-between; padding: 0 2px; margin-top: 2px; }
+
+/* 拖拽时的虚影 */
+#placement-ghost {
+    position: absolute; width: 60px; height: 60px; 
+    z-index: 200; pointer-events: none; display: none;
+    flex-direction: column; align-items: center; justify-content: flex-end;
+    opacity: 0.8;
+}
+#placement-ghost.valid img { filter: drop-shadow(0 0 5px #00ff00); }
+#placement-ghost.invalid img { filter: grayscale(100%) drop-shadow(0 0 5px #ff0000); opacity: 0.5; }
+#placement-ghost.valid::after { content: '✔️'; position: absolute; top: -10px; color: #00ff00; font-weight: bold; }
+#placement-ghost.invalid::after { content: '❌'; position: absolute; top: -10px; color: #ff0000; font-weight: bold; }
+
+/* 修改原 .building 样式：定位改为 top/left 以便手动放置 */
+.building { 
+    position: absolute; /* 关键！ */
+    width: 60px; height: 60px; 
+    font-size: 10px; color: rgba(255,255,255,0.9); text-shadow: 0 0 2px black; 
+    pointer-events: auto; 
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+}
+
+.build-res-icon { width: 12px; height: 12px; vertical-align: middle; margin-right: 2px; }
+
     </style>
 </head>
 <body>
@@ -179,18 +596,46 @@
 
     <div id="bg-mask"></div>    <!-- 新增：原背景遮罩层，用于淡出效果 -->
 
-    <div id="ui-top">
-        <div class="res-item" id="res-item-treasury"><div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/food.png"></div><div class="res-value" id="res-treasury">50</div><div>粮食</div></div>
-        <div class="res-item" id="res-item-people"><div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/tech.png"></div><div class="res-value" id="res-people">50</div><div>科技</div></div>
-        <div class="res-item" id="res-item-military"><div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/army.png"></div><div class="res-value" id="res-military">50</div><div>军事</div></div>
-        <div class="res-item" id="res-item-culture"><div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/culture1.png"></div><div class="res-value" id="res-culture">50</div><div>文化</div></div>
+    <!-- 修改 index.html 中的 #ui-top 结构 -->
+<div id="ui-top">
+    <!-- 粮食 -->
+    <div class="res-item" id="res-item-treasury">
+        <div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/food.png"></div>
+        <div class="res-value" id="res-treasury">50</div>
+        <div class="res-bar-bg"><div class="res-bar-fill" id="bar-treasury"></div></div>
     </div>
+    <!-- 科技 -->
+    <div class="res-item" id="res-item-people">
+        <div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/tech.png"></div>
+        <div class="res-value" id="res-people">50</div>
+        <div class="res-bar-bg"><div class="res-bar-fill" id="bar-people"></div></div>
+    </div>
+    <!-- 军事 -->
+    <div class="res-item" id="res-item-military">
+        <div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/army.png"></div>
+        <div class="res-value" id="res-military">50</div>
+        <div class="res-bar-bg"><div class="res-bar-fill" id="bar-military"></div></div>
+    </div>
+    <!-- 文化 -->
+    <div class="res-item" id="res-item-culture">
+        <div class="res-icon"><img src="https://cdn.jsdelivr.net/gh/LuoshuiCat/demo@main/assets/culture1.png"></div>
+        <div class="res-value" id="res-culture">50</div>
+        <div class="res-bar-bg"><div class="res-bar-fill" id="bar-culture"></div></div>
+    </div>
+</div>
     
     <div id="world-layer">
         <div id="scene-mask"></div>
-        <div id="event-display"><div id="event-title">加载中</div><div id="event-desc">请稍候...</div></div>
+         <div id="event-display">
+            <div id="event-title">加载中</div>
+            <div id="event-desc">请稍候...</div>
+        </div>
         <div id="idle-panel"><div id="final-timer">安史之乱倒计时: 05:00</div><div id="income-stats"></div></div>
         <div id="buildings-container"></div>
+        <!-- 在 <div id="buildings-container"></div> 的下面一行添加： -->
+<div id="placement-ghost">
+    <div class="building-icon"><img src="" id="ghost-img"></div>
+</div>
     </div>
     
     <!-- 文字层：独立于场景和滑动区 -->
@@ -199,10 +644,41 @@
         <div class="center-text right-text" id="txt-right">选项B</div>
     </div>
 
-    <div id="side-ui">
-        <div style="position:relative"><svg id="progress-ring"><circle cx="35" cy="35" r="30" /></svg><div id="recruit-btn" class="action-btn" onclick="tryStartRecruit()"><div style="font-size:24px">➕</div><div style="font-size:12px;font-weight:bold" id="recruit-status">招募(0)</div></div></div>
-        <div id="disaster-btn" class="action-btn" onclick="handleDisaster()"><div style="font-size:28px">⚠️</div><div style="font-size:12px;font-weight:bold">灾害</div></div>
+   <div id="side-ui">
+    <div style="position:relative">
+        <!-- 移除 SVG -->
+        <div id="recruit-btn" class="action-btn" onclick="tryStartRecruit()">
+            <!-- 新增：冷却遮罩和文字 -->
+            <div id="recruit-overlay"></div>
+            <div id="recruit-timer-text">0</div>
+            
+            <!-- 原有内容 -->
+            <div style="font-size:24px">➕</div>
+            <div style="font-size:12px;font-weight:bold" id="recruit-status">招募(2)</div>
+        </div>
     </div>
+    
+    <div id="build-btn" class="action-btn" onclick="openBuildPanel()">
+        <div style="font-size:24px">🔨</div>
+        <div style="font-size:12px;font-weight:bold">建造</div>
+    </div>
+    
+    <div id="disaster-btn" class="action-btn" onclick="handleGovernment()">
+        <div style="font-size:28px">⚠️</div>
+        <div style="font-size:12px;font-weight:bold">政务</div>
+    </div>
+</div>
+
+    <!-- 建筑选择面板 (新增) -->
+<div id="build-panel">
+    <div class="panel-header">
+        <span class="panel-title">选择建筑以调整国策</span>
+        <span class="close-btn" onclick="closeBuildPanel()">×</span>
+    </div>
+    <div class="build-grid" id="build-grid">
+        <!-- JS 动态生成 -->
+    </div>
+</div>
     
     <div id="swipe-area">
         <div id="swipe-card">
