@@ -1034,7 +1034,7 @@ function startIntro() {
     showMask(); 
     
     ui.eventTitle.innerText = "序幕";
-    ui.eventDesc.innerText = "一个新的王朝拉开了序幕，现在，你需要处理的第一件事是：";
+    ui.eventDesc.innerText = "一个新的王朝拉开了序幕 \n 请左右滑动下方卡片开始游戏 \n  \n （注：建造页面有四行，可向下滑动） \n （将建筑拖动到场景中进行建造） \n （开始游戏后，点击屏幕可获得少许资源） \n （单项数值过高或过低都会导致文明覆灭） \n （图片资源保存在github中，可能会受网络影响）";
     
     ui.txtLeft.innerText = "开始"; 
     ui.txtRight.innerText = "开始"; 
@@ -2128,13 +2128,13 @@ function calculateEnding() {
         if (resources.military >= 200 && resources.people >= 150) { 
             w = true; t = "御驾亲征，大破叛军！\n大唐国祚得以延续百年。"; 
         } else { 
-            w = false; t = "军心涣散，大败于敌，文明被毁之一旦。"; // 战败算失败
+            w = false; t = "军事和科技值不够。军心涣散，大败于敌，文明被毁之一旦。"; // 战败算失败
         } 
     } else if (nextCardId === "end_flee") { 
-        if (resources.treasury >= 180 || resources.people >= 150) { 
+        if (resources.treasury >= 200 || resources.culture >= 150) { 
             w = true; t = "忍辱负重，退守蜀地，徐图后计。"; 
         } else { 
-            w = false; t = "逃亡路上，禁军哗变，文明到此结束。"; 
+            w = false; t = "粮食和文化值不够。逃亡路上，禁军哗变，文明到此结束。"; 
         } 
     } 
     
