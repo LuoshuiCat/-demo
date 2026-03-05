@@ -82,29 +82,29 @@ const policyTrees = [
             id: "c1", 
             title: "开凿大运河", 
             desc: "江南富庶，中原腹地，若有一河贯通，南粮可北运，国运或可昌隆。然此役浩大，征发民夫百万，恐生民变。工部尚书呈上两策：一为激进施工，二为缓图之。", 
-            left: { text: "功在千秋，即刻开工！", effect: { treasury: -10, people: -5, culture: 5 }, nextId: "c2_start" }, 
+            left: { text: "功在千秋，即刻开工！", effect: { treasury: -10, people: 5, culture: -5 }, nextId: "c2_start" }, 
             right: { text: "百姓方安，缓图之。", effect: { treasury: 5, people: 5 }, nextId: "c2_stop" } 
         },
         { 
             id: "c2_stop", 
             title: "休养生息", 
             desc: "旨意一下，举国欢腾。但南方漕运不通，长安米价飞涨，市井颇有怨言。户部提议开仓放粮，但这会削弱国储。", 
-            left: { text: "开仓放粮，平抑米价。", effect: { treasury: -10, people: 10 }, nextId: "c3_stop_good" }, 
-            right: { text: "市场之事，官府不宜干预。", effect: { treasury: 5, people: -5 }, nextId: "c3_stop_bad" } 
+            left: { text: "开仓放粮，平抑米价。", effect: { treasury: -10, culture: 10 }, nextId: "c3_stop_good" }, 
+            right: { text: "市场之事，官府不宜干预。", effect: { treasury: 5, culture: -5 }, nextId: "c3_stop_bad" } 
         },
         { 
             id: "c3_stop_good", 
             title: "盛世安宁", 
             desc: "百姓感念皇恩，虽无大工，但根基稳固，各地传来丰收喜讯。", 
             left: { text: "减税一年，休养生息。", effect: { treasury: -5, people: 10 }, nextId: "c4_end_peace" }, 
-            right: { text: "鼓励农桑，屯田养兵。", effect: { treasury: 5, people: 5 }, nextId: "c4_end_peace" } 
+            right: { text: "鼓励农桑，屯田养兵。", effect: { treasury: 5, military: 5 }, nextId: "c4_end_peace" } 
         },
         { 
             id: "c3_stop_bad", 
             title: "民怨沸腾", 
             desc: "米价失控，饥民开始哄抢粮店，地方官员请求增兵弹压。", 
             left: { text: "出兵弹压，以儆效尤。", effect: { military: 5, people: -10 }, nextId: "c4_end_chaos" }, 
-            right: { text: "下诏罪己，开仓赈济。", effect: { treasury: -10, people: 10 }, nextId: "c4_end_peace" } 
+            right: { text: "下诏罪己，开仓赈济。", effect: { treasury: -10, culture: 10 }, nextId: "c4_end_peace" } 
         },
         { 
             id: "c4_end_peace", 
@@ -164,8 +164,8 @@ const policyTrees = [
             id: "c5_end_bad", 
             title: "血色运河", 
             desc: "功业已成，然怨气冲天，为日后埋下祸根。", 
-            left: { text: "唉", effect: { people: -10 }, nextId: "end" }, 
-            right: { text: "唉", effect: { people: -10 }, nextId: "end" } 
+            left: { text: "唉", effect: { culture: -10 }, nextId: "end" }, 
+            right: { text: "唉", effect: { culture: -10 }, nextId: "end" } 
         }
     ],
 
@@ -192,8 +192,8 @@ const policyTrees = [
             left: { text: "严加戒备", effect: {}, special: "gamble", winNext: "b3_meeting_win", loseNext: "b3_meeting_lose" }, 
             right: { text: "推杯换盏，以诚相待", effect: {}, special: "gamble", winNext: "b3_meeting_win", loseNext: "b3_meeting_lose" } 
         },
-        { id: "b3_meeting_win", title: "不辱使命", desc: "你的气度（或武力）震慑了可汗，双方歃血为盟，边境暂得安宁。", left: { text: "回师", effect: { people: 10 }, nextId: "b4_end_win" }, right: { text: "回师", effect: { people: 10 }, nextId: "b4_end_win" } },
-        { id: "b3_meeting_lose", title: "身陷囹圄", desc: "突厥翻脸，将你扣押。朝廷为了赎你，不得不割让三州。", left: { text: "奇耻大辱", effect: { people: -15, culture: -10 }, nextId: "b4_end_shame" }, right: { text: "奇耻大辱", effect: { people: -15, culture: -10 }, nextId: "b4_end_shame" } },
+        { id: "b3_meeting_win", title: "不辱使命", desc: "你的气度（或武力）震慑了可汗，双方歃血为盟，边境暂得安宁。", left: { text: "回师", effect: { military: 10 }, nextId: "b4_end_win" }, right: { text: "回师", effect: { people: 10 }, nextId: "b4_end_win" } },
+        { id: "b3_meeting_lose", title: "身陷囹圄", desc: "突厥翻脸，将你扣押。朝廷为了赎你，不得不割让三州。", left: { text: "奇耻大辱", effect: { treasury: -15, culture: -10 }, nextId: "b4_end_shame" }, right: { text: "奇耻大辱", effect: { people: -15, culture: -10 }, nextId: "b4_end_shame" } },
 
         { id: "b4_end_shame", title: "偏安一隅", desc: "大唐虽存，已无天可汗之威，苟延残喘。", left: { text: "...", effect: { culture: -5 }, nextId: "end" }, right: { text: "...", effect: { culture: -5 }, nextId: "end" } },
         { id: "b4_end_win", title: "大捷", desc: "突厥远遁，边关十年无事。", left: { text: "...", effect: { military: 15 }, nextId: "end" }, right: { text: "...", effect: { military: 15 }, nextId: "end" } },
@@ -203,21 +203,21 @@ const policyTrees = [
             id: "b2_war", 
             title: "战局胶着", 
             desc: "两军对垒，互有胜负。有将领建议趁夜火攻敌营，但这有违仁义，且风向难测。", 
-            left: { text: "兵不厌诈，批准火攻！", effect: { military: 10, people: -5 }, nextId: "b3_war_fire" }, 
+            left: { text: "兵不厌诈，批准火攻！", effect: { military: 10, culture: -5 }, nextId: "b3_war_fire" }, 
             right: { text: "堂堂正正，正面决战！", effect: { military: -5, treasury: -10 }, nextId: "b3_war_charge" } 
         },
         { 
             id: "b3_war_fire", 
             title: "烈火焚原", 
             desc: "一把大火，突厥大营化为灰烬，敌军溃败。但同时也烧毁了边境草场，风沙骤起。", 
-            left: { text: "胜者为王，无需多虑。", effect: { military: 10, culture: -5 }, nextId: "b4_end_fire" }, 
+            left: { text: "胜者为王，无需多虑。", effect: { military: 10, culture: -10 }, nextId: "b4_end_fire" }, 
             right: { text: "于心不忍，安抚灾民。", effect: { treasury: -5, people: 5 }, nextId: "b4_end_fire" } 
         },
         { 
             id: "b3_war_charge", 
             title: "惨烈决战", 
             desc: "正面交锋，杀敌一千自损八百，双方尸横遍野。", 
-            left: { text: "厚葬将士，抚恤家属。", effect: { treasury: -10, people: 10 }, nextId: "b4_end_blood" }, 
+            left: { text: "厚葬将士，抚恤家属。", effect: { treasury: -10, culture: 10 }, nextId: "b4_end_blood" }, 
             right: { text: "整顿军纪，再战！", effect: { military: 5 }, nextId: "b4_end_blood" } 
         },
         { 
@@ -249,8 +249,8 @@ const policyTrees = [
             id: "f2_build", 
             title: "举国狂热", 
             desc: "寺院林立，钟鼓齐鸣。然农田荒芜，劳动力流失。一日，有僧人称见到佛光，乃是祥瑞。", 
-            left: { text: "大肆宣扬，以此安民", effect: { culture: 10, people: 5 }, nextId: "f3_miracle" }, 
-            right: { text: "严查真伪，防妖言惑众", effect: { people: -5, treasury: 5 }, nextId: "f3_miracle" } 
+            left: { text: "大肆宣扬，以此安民", effect: { culture: 10, people: -5 }, nextId: "f3_miracle" }, 
+            right: { text: "严查真伪，防妖言惑众", effect: { people: 5, treasury: 5 }, nextId: "f3_miracle" } 
         },
         // 【随机判定】：佛光真伪
         // 左(宣扬) = 押大；右(严查) = 押小
@@ -259,8 +259,8 @@ const policyTrees = [
             left: { text: "相信是祥瑞", effect: {}, special: "gamble", winNext: "f3_miracle_win", loseNext: "f3_miracle_lose" }, 
             right: { text: "质疑其真伪", effect: {}, special: "gamble", winNext: "f3_miracle_win", loseNext: "f3_miracle_lose" } 
         },
-        { id: "f3_miracle_win", title: "天降祥瑞", desc: "万民跪拜，香火鼎盛，国库虽空，但百姓精神富足。", left: { text: "善哉", effect: { culture: 20, people: 10 }, nextId: "f4_end_holy" }, right: { text: "善哉", effect: { culture: 20, people: 10 }, nextId: "f4_end_holy" } },
-        { id: "f3_miracle_lose", title: "骗局败露", desc: "所谓佛光竟是僧人点燃的磷火！民众大失所望，信仰崩塌。", left: { text: "严惩僧人", effect: { people: -10, culture: -10 }, nextId: "f4_end_poor" }, right: { text: "掩盖真相", effect: { treasury: -10 }, nextId: "f4_end_poor" } },
+        { id: "f3_miracle_win", title: "天降祥瑞", desc: "万民跪拜，香火鼎盛，国库虽空，但百姓精神富足。", left: { text: "善哉", effect: { culture: 20, people: -10 }, nextId: "f4_end_holy" }, right: { text: "善哉", effect: { culture: 20, people: 10 }, nextId: "f4_end_holy" } },
+        { id: "f3_miracle_lose", title: "骗局败露", desc: "所谓佛光竟是僧人点燃的磷火！民众大失所望，信仰崩塌。", left: { text: "严惩僧人", effect: { people: 10, culture: -10 }, nextId: "f4_end_poor" }, right: { text: "掩盖真相", effect: { treasury: -10 }, nextId: "f4_end_poor" } },
 
         { id: "f4_end_holy", title: "西方极乐", desc: "大唐成为佛国圣地，万国来朝。", left: { text: "...", effect: { culture: 10 }, nextId: "end" }, right: { text: "...", effect: { culture: 10 }, nextId: "end" } },
         { id: "f4_end_poor", title: "寺庙富甲", desc: "百姓食不果腹，僧侣却肥头大耳。", left: { text: "...", effect: { treasury: -10 }, nextId: "end" }, right: { text: "...", effect: { treasury: -10 }, nextId: "end" } },
@@ -269,7 +269,7 @@ const policyTrees = [
             id: "f2_kill", 
             title: "会昌法难", 
             desc: "拆毁寺院，勒令僧尼还俗，没收寺产。举国哗然，僧侣聚集宫门抗议。", 
-            left: { text: "强力驱散，严惩不贷。", effect: { people: -10, military: 5 }, nextId: "f3_kill_hard" }, 
+            left: { text: "强力驱散，严惩不贷。", effect: { culture: -10, military: 5 }, nextId: "f3_kill_hard" }, 
             right: { text: "安抚劝导，发放遣散费。", effect: { treasury: -5, people: 5 }, nextId: "f3_kill_soft" } 
         },
         { 
@@ -277,7 +277,7 @@ const policyTrees = [
             title: "血染袈裟", 
             desc: "流血冲突在所难免，背负了骂名，但国库确实充盈了。", 
             left: { text: "为了社稷，值得。", effect: { treasury: 20, culture: -10 }, nextId: "f4_end_rich" }, 
-            right: { text: "残忍。", effect: { treasury: 10 }, nextId: "f4_end_rich" } 
+            right: { text: "于心不忍。", effect: { treasury: 10 }, nextId: "f4_end_rich" } 
         },
         { 
             id: "f3_kill_soft", 
@@ -550,12 +550,12 @@ const governmentEvents = [
             },
             { 
                 id: "gov1_q2", title: "考生抗议", desc: "处理结果公布后，落榜考生在贡院门前抗议，认为其中有黑幕，甚至有人绝食。", 
-                left: { text: "增加名额，安抚人心", effect: { treasury: -10, people: 10 } }, 
-                right: { text: "派兵驱散，维护秩序", effect: { military: 5, people: -15 } } 
+                left: { text: "增加名额，安抚人心", effect: { treasury: -10, culture: 10 } }, 
+                right: { text: "派兵驱散，维护秩序", effect: { military: 5, culture: -15 } } 
             },
             { 
                 id: "gov1_q3", title: "真假试卷", desc: "查抄出的泄题试卷，字迹竟与当朝状元一模一样。是陷害，还是确有其事？", 
-                left: { text: "取消状元资格", effect: { culture: 10, people: 5 } }, 
+                left: { text: "取消状元资格", effect: { culture: 10, people: 10 } }, 
                 right: { text: "判定为陷害，维持原判", effect: { culture: -5, people: -5 } } 
             },
             { 
@@ -575,13 +575,13 @@ const governmentEvents = [
         questions: [
             { 
                 id: "gov2_q1", title: "互市冲突", desc: "边关互市中，胡商与大唐商户发生斗殴，双方各有损伤。胡商声称被欺诈。", 
-                left: { text: "严惩大唐商户", effect: { people: -10, culture: 10 } }, 
+                left: { text: "严惩大唐商户", effect: { people: -10, treasury: 15 } }, 
                 right: { text: "驱赶胡商，护我子民", effect: { people: 5, military: 5 } } 
             },
             { 
                 id: "gov2_q2", title: "物品检疫", desc: "在查验货物时，发现胡商的马匹中混入了几匹带有疫病的马，若流入民间后果不堪设想。", 
-                left: { text: "全部扑杀，杜绝后患", effect: { treasury: -20, people: -10 } }, 
-                right: { text: "低价收购，隔离治疗", effect: { treasury: 5, people: 10 } } 
+                left: { text: "全部扑杀，杜绝后患", effect: { treasury: -5, people: 10 } }, 
+                right: { text: "低价收购，隔离治疗", effect: { treasury: -10, people: 15 } } 
             },
             { 
                 id: "gov2_q3", title: "走私军火", desc: "截获了一批走私的精良兵器，竟是运往内地私贩的。背后似乎有军方背景。", 
@@ -610,13 +610,13 @@ const governmentEvents = [
             },
             { 
                 id: "gov3_q2", title: "排练冲突", desc: "新旧乐师在排练时发生冲突，老乐师认为新曲离经叛道，坏了祖宗规矩。", 
-                left: { text: "支持创新，贬谪老乐师", effect: { culture: 10, people: -10 } }, 
-                right: { text: "尊崇传统，修改新曲", effect: { people: 5, culture: -10 } } 
+                left: { text: "支持创新，贬谪老乐师", effect: { culture: -10, people: 10 } }, 
+                right: { text: "尊崇传统，修改新曲", effect: { people: -5, culture: 5 } } 
             },
             { 
                 id: "gov3_q3", title: "乐器采购", desc: "为了筹备大典，需要采购一批昂贵的西域乐器。户部表示没钱，内务府却想借机敛财。", 
                 left: { text: "从简办理，用旧乐器", effect: { treasury: 10, culture: -10 } }, 
-                right: { text: "拨款采购，不求最好", effect: { treasury: -20, culture: 10 } } 
+                right: { text: "拨款采购，但求最好", effect: { treasury: -20, culture: 10 } } 
             },
             { 
                 id: "gov3_q4", title: "贵妃的请求", desc: "贵妃想让自己的亲戚在乐队中谋个闲职，但这会破坏编制，引起其他乐师不满。", 
